@@ -1,20 +1,24 @@
 import { notFound } from "next/navigation";
 import { CompareToggle } from "@/components/compare-toggle";
+import { prisma } from "@/lib/prisma";
 
 async function getCollege(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/colleges/${id}`, {
-    cache: "no-store",
+  const college = await prisma.college.findUnique({
+    where: { id },
+    include: {
+      courses: true,
+      reviews: { include: { user: { select: { name: true, avatarUrl: true } } } },
+    },
   });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to load college");
-  return res.json();
+
+  if (!college) return null;
+  return college;
 }
 
 export default async function CollegeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const data = await getCollege(id);
-  if (!data) notFound();
-  const college = data.data;
+  const college = await getCollege(id);
+  if (!college) notFound();
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
