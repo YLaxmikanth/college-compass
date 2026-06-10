@@ -1,17 +1,67 @@
 import { CollegeCard } from "@/components/college-card";
 import { CollegeSearch } from "@/components/college-search";
 import { Pagination } from "@/components/pagination";
+import { collegeQuerySchema } from "@/lib/validators";
+import { prisma } from "@/lib/prisma";
 import type { CollegeCardData } from "@/components/college-card";
 
 async function getColleges(searchParams: Record<string, string | string[] | undefined>) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const url = new URL("/api/colleges", baseUrl);
-  Object.entries(searchParams).forEach(([key, value]) => {
-    if (typeof value === "string" && value) url.searchParams.set(key, value);
+  const normalize = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+
+  const parsed = collegeQuerySchema.parse({
+    search: normalize(searchParams.search) ?? "",
+    city: normalize(searchParams.city) ?? "",
+    type: normalize(searchParams.type) ?? undefined,
+    minRating: normalize(searchParams.minRating) ?? undefined,
+    page: normalize(searchParams.page) ?? "1",
+    limit: normalize(searchParams.limit) ?? "12",
+    sort: normalize(searchParams.sort) ?? "rating",
   });
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to load colleges");
-  return res.json();
+
+  const { search, city, type, minRating, page, limit, sort } = parsed;
+
+  const where = {
+    AND: [
+      search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" as const } },
+              { city: { contains: search, mode: "insensitive" as const } },
+              { category: { contains: search, mode: "insensitive" as const } },
+            ],
+          }
+        : {},
+      city ? { city: { contains: city, mode: "insensitive" as const } } : {},
+      type ? { type } : {},
+      minRating ? { rating: { gte: minRating } } : {},
+    ],
+  };
+
+  const orderBy =
+    sort === "tuition"
+      ? { tuition: "asc" as const }
+      : sort === "ranking"
+        ? { ranking: "asc" as const }
+        : sort === "recent"
+          ? { createdAt: "desc" as const }
+          : { rating: "desc" as const };
+
+  const [total, colleges] = await Promise.all([
+    prisma.college.count({ where }),
+    prisma.college.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+      include: { courses: true, reviews: true },
+    }),
+  ]);
+
+  return {
+    data: colleges,
+    meta: { total, page, limit, totalPages: Math.max(1, Math.ceil(total / limit)) },
+  };
 }
 
 export default async function CollegesPage({
