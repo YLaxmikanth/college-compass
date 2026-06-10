@@ -17,8 +17,11 @@ export default function HomePage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/colleges" className="rounded-full bg-slate-900 px-5 py-3 text-white">
-            Browse colleges
+          <Link
+            href="/colleges"
+            className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-white font-semibold shadow-sm shadow-slate-200/30 hover:bg-slate-800"
+          >
+            <span className="text-white">Browse Colleges</span>
           </Link>
           <Link href="/compare" className="rounded-full border border-slate-300 px-5 py-3">
             Compare colleges
