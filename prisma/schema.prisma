@@ -48,6 +48,9 @@ model College {
   featuredImage   String
   establishedYear Int
   placements      String
+  averagePackage  Float?
+  highestPackage  Float?
+  placementRate   Float?
   hostels         Boolean        @default(false)
   scholarships    Boolean        @default(false)
   aiEnabled       Boolean        @default(false)

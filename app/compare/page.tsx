@@ -106,6 +106,30 @@ export default function ComparePage() {
                     </td>
                   ))}
                 </tr>
+                <tr className="border-b border-slate-200 bg-slate-50">
+                  <th className="px-4 py-4 text-left font-semibold">Average package</th>
+                  {orderedData.map((college) => (
+                    <td key={college.id} className="px-4 py-4 text-center">
+                      {college.averagePackage ? `₹${college.averagePackage.toFixed(1)} LPA` : "-"}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-b border-slate-200">
+                  <th className="px-4 py-4 text-left font-semibold">Highest package</th>
+                  {orderedData.map((college) => (
+                    <td key={college.id} className="px-4 py-4 text-center">
+                      {college.highestPackage ? `₹${college.highestPackage.toFixed(1)} LPA` : "-"}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-b border-slate-200 bg-slate-50">
+                  <th className="px-4 py-4 text-left font-semibold">Placement rate</th>
+                  {orderedData.map((college) => (
+                    <td key={college.id} className="px-4 py-4 text-center">
+                      {college.placementRate ? `${college.placementRate.toFixed(0)}%` : "-"}
+                    </td>
+                  ))}
+                </tr>
                 <tr className="bg-slate-50">
                   <th className="px-4 py-4 text-left font-semibold">Overview</th>
                   {orderedData.map((college) => (

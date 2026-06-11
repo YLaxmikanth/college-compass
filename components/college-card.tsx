@@ -12,6 +12,9 @@ export type CollegeCardData = {
   rating: number;
   tuition: number;
   acceptanceRate?: number;
+  averagePackage?: number;
+  highestPackage?: number;
+  placementRate?: number;
   overview: string;
 };
 

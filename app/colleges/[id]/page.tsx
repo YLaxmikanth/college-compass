@@ -37,7 +37,34 @@ export default async function CollegeDetailPage({ params }: { params: Promise<{ 
           <Metric label="Tuition" value={`₹${college.tuition.toLocaleString()}`} />
           <Metric label="Rating" value={college.rating.toFixed(1)} />
           <Metric label="Acceptance" value={`${college.acceptanceRate}%`} />
+          <Metric
+            label="Average package"
+            value={college.averagePackage ? `₹${college.averagePackage.toFixed(1)} LPA` : "-"}
+          />
+          <Metric
+            label="Highest package"
+            value={college.highestPackage ? `₹${college.highestPackage.toFixed(1)} LPA` : "-"}
+          />
+          <Metric
+            label="Placement rate"
+            value={college.placementRate ? `${college.placementRate.toFixed(0)}%` : "-"}
+          />
         </div>
+
+        {college.courses.length > 0 ? (
+          <section className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <h2 className="text-2xl font-semibold">Courses offered</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {college.courses.map((course: { id: string; name: string; duration: string; degree: string; seatCount: number }) => (
+                <div key={course.id} className="rounded-2xl bg-white p-4 shadow-sm">
+                  <h3 className="font-semibold">{course.name}</h3>
+                  <p className="mt-1 text-sm text-slate-600">{course.degree} · {course.duration}</p>
+                  <p className="mt-2 text-sm text-slate-500">Seats: {course.seatCount}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
     </main>
   );
